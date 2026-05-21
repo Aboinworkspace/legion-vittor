@@ -1,0 +1,17 @@
+# Legion Vittor — Render.com deploy config
+# Free tier: 512MB RAM, shared CPU, auto-sleep after 15min inactivity
+# Deploy at: render.com → New Web Service → connect GitHub repo
+
+services:
+  - type: web
+    name: legion-vittor-backend
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: APP_ENV
+        value: production
+      # Add all other env vars in Render dashboard
+      # DO NOT put API keys in this file

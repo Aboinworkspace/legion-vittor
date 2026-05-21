@@ -1,0 +1,139 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Legion Vittor Brand */
+  --lv-navy:    #1a1f4e;
+  --lv-gold:    #c8a84b;
+  --lv-bg:      #f5f4f0;
+  --lv-white:   #ffffff;
+  --lv-border:  #e4e2da;
+
+  /* Department colors */
+  --dept-leadership: #7F77DD;
+  --dept-engineering: #378ADD;
+  --dept-marketing: #BA7517;
+  --dept-support: #3B6D11;
+  --dept-payments: #1D9E75;
+  --dept-video: #D4537E;
+  --dept-rnd: #7F77DD;
+
+  /* Status */
+  --status-active: #3B6D11;
+  --status-busy: #BA7517;
+  --status-idle: #888;
+  --status-error: #A32D2D;
+}
+
+@layer base {
+  * { box-sizing: border-box; }
+  
+  body {
+    font-family: var(--font-body), 'DM Sans', system-ui, sans-serif;
+    background-color: var(--lv-bg);
+    color: var(--lv-navy);
+  }
+
+  .font-display {
+    font-family: var(--font-display), 'Playfair Display', Georgia, serif;
+  }
+}
+
+@layer components {
+  /* LV Logo box */
+  .lv-logo-box {
+    @apply w-9 h-9 bg-lv-navy rounded-lg flex items-center justify-center text-lv-gold font-display font-bold text-sm flex-shrink-0;
+  }
+
+  /* Status dot */
+  .status-dot {
+    @apply w-2 h-2 rounded-full flex-shrink-0;
+  }
+  .status-dot.active { @apply bg-green-700; }
+  .status-dot.busy   { @apply bg-amber-600; }
+  .status-dot.idle   { @apply bg-gray-400; }
+  .status-dot.error  { @apply bg-red-700; }
+
+  /* Agent message bubble */
+  .msg-bubble {
+    @apply rounded-xl px-3 py-2 text-sm leading-relaxed border max-w-[92%];
+  }
+  .msg-bubble.agent {
+    @apply bg-white border-gray-200 text-gray-800;
+  }
+  .msg-bubble.user {
+    @apply bg-lv-navy text-white border-lv-navy ml-auto;
+  }
+  .msg-bubble.system {
+    @apply bg-transparent border-dashed border-gray-300 text-gray-500 text-xs text-center mx-auto max-w-full;
+  }
+
+  /* Department badge */
+  .dept-badge {
+    @apply text-[10px] px-2 py-0.5 rounded-full font-medium;
+  }
+
+  /* Card */
+  .lv-card {
+    @apply bg-white rounded-xl border border-gray-200 overflow-hidden;
+  }
+
+  /* Button primary */
+  .btn-primary {
+    @apply bg-lv-navy text-white text-sm px-4 py-2 rounded-lg hover:bg-navy-800 transition-colors font-medium;
+  }
+
+  /* Input */
+  .lv-input {
+    @apply w-full text-sm border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-lv-navy transition-colors bg-white;
+  }
+
+  /* Nav item */
+  .nav-item {
+    @apply text-xs px-3 py-2 text-gray-500 hover:text-lv-navy cursor-pointer border-r border-gray-200 transition-colors;
+  }
+  .nav-item.active {
+    @apply text-lv-navy font-medium bg-gray-50;
+  }
+
+  /* Typing animation */
+  .typing-dot {
+    @apply w-1.5 h-1.5 rounded-full bg-gray-400;
+    animation: typing 1.2s infinite;
+  }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+}
+
+@keyframes typing {
+  0%, 100% { opacity: 0.3; transform: translateY(0); }
+  50%       { opacity: 1;   transform: translateY(-3px); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+.pulse-dot {
+  animation: pulse-dot 1.4s infinite;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar       { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d0cec6; border-radius: 2px; }
+
+/* Tailwind custom colors */
+@layer utilities {
+  .bg-lv-bg    { background-color: var(--lv-bg); }
+  .bg-lv-navy  { background-color: var(--lv-navy); }
+  .bg-lv-gold  { background-color: var(--lv-gold); }
+  .text-lv-navy { color: var(--lv-navy); }
+  .text-lv-gold { color: var(--lv-gold); }
+  .border-lv-navy { border-color: var(--lv-navy); }
+  .border-lv-gold { border-color: var(--lv-gold); }
+  .font-body    { font-family: var(--font-body), sans-serif; }
+  .font-display { font-family: var(--font-display), serif; }
+}
