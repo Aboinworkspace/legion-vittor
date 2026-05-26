@@ -81,7 +81,7 @@
 
   /* Button primary */
   .btn-primary {
-    @apply bg-lv-navy text-white text-sm px-4 py-2 rounded-lg hover:bg-navy-800 transition-colors font-medium;
+    @apply bg-lv-navy text-white text-sm px-4 py-2 rounded-lg hover:opacity-90 transition-colors font-medium;
   }
 
   /* Input */
