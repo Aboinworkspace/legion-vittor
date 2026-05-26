@@ -25,12 +25,12 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
             if profile.data:
                 user_data.update(profile.data)
             return user_data
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"[Auth] get_current_user error: {e}")
     raise HTTPException(status_code=401, detail="Invalid or expired token")
 
 
-# ── Request models ────────────────────────────────────────────────────────────
+# ── Request models ─────────────────────────────────────────────────────────
 
 class SignUpRequest(BaseModel):
     email: EmailStr
@@ -54,7 +54,7 @@ class SetupRequest(BaseModel):
     post_frequency: str = "Daily"
 
 
-# ── Routes ───────────────────────────────────────────────────────────────────
+# ── Routes ────────────────────────────────────────────────────────────
 
 @router.post("/signup")
 async def signup(request: SignUpRequest):
@@ -82,29 +82,52 @@ async def signup(request: SignUpRequest):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        print(f"[Auth] signup error: {e}")
+        raise HTTPException(status_code=400, detail=f"Signup failed: {str(e)}")
 
 
 @router.post("/signin")
 async def signin(request: SignInRequest):
+    """Sign in user with email and password. Returns access token."""
     try:
         client = get_supabase_anon()
         result = client.auth.sign_in_with_password({
             "email": request.email,
             "password": request.password,
         })
-        if result.user and result.session:
-            return {
-                "success": True,
-                "access_token": result.session.access_token,
-                "user_id": str(result.user.id),
-                "email": result.user.email,
-            }
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+        
+        if not result.user:
+            print(f"[Auth] signin failed: no user returned for {request.email}")
+            raise HTTPException(status_code=401, detail="Invalid credentials")
+            
+        if not result.session:
+            print(f"[Auth] signin failed: no session for {request.email}")
+            raise HTTPException(status_code=401, detail="No session created")
+        
+        # Fetch user profile from users table
+        db = get_supabase()
+        profile = db.table("users").select("*").eq("id", str(result.user.id)).single().execute()
+        
+        user_data = {
+            "id": str(result.user.id),
+            "email": result.user.email,
+            "setup_complete": False,
+        }
+        if profile.data:
+            user_data.update(profile.data)
+        
+        return {
+            "success": True,
+            "access_token": result.session.access_token,
+            "user_id": str(result.user.id),
+            "email": result.user.email,
+            "user": user_data,
+        }
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+        print(f"[Auth] signin error: {e}")
+        raise HTTPException(status_code=401, detail="Authentication failed")
 
 
 @router.post("/setup")
@@ -130,15 +153,17 @@ async def complete_setup(request: SetupRequest, user=Depends(get_current_user)):
 
         return {"success": True, "message": "Setup complete. Your virtual office is ready."}
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        print(f"[Auth] setup error: {e}")
+        raise HTTPException(status_code=400, detail=f"Setup failed: {str(e)}")
 
 
 @router.get("/me")
 async def get_me(user=Depends(get_current_user)):
+    """Get current logged-in user profile."""
     return user
 
 
-# ── Seed helpers ──────────────────────────────────────────────────────────────
+# ── Seed helpers ──────────────────────────────────────────────────────────
 
 async def _seed_departments(user_id: str):
     db = get_supabase()
