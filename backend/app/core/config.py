@@ -40,12 +40,17 @@ class Settings(BaseSettings):
     youtube_client_secret: str = ""
     youtube_refresh_token: str = ""
 
-    # CORS
-    allowed_origins: List[str] = ["http://localhost:3000"]
+    # ── CORS (dynamic from environment) ────────────────────────────────
+    allowed_origins_str: str = "http://localhost:3000"
 
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
+
+    @property
+    def allowed_origins(self) -> List[str]:
+        """Parse CORS origins from comma-separated env var"""
+        return [origin.strip() for origin in self.allowed_origins_str.split(",")]
 
 
 settings = Settings()
